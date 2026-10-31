@@ -38,7 +38,7 @@ class PIDController():
         # TODO: implement a PID controller to track the reference heading
         # feel free to make use of the global variables:
         # self.kp, self.ki, and self. kd, which are
-        # set either by the notebook or from noVNC
+        # set from the notebook panel (ROS 2 parameters kp, ki, kd)
         # as well as self_prev_int_heading to track the integral term
         # self.prev_e_heading the previous error. But note that you
         # should be the one to update them also.
@@ -68,7 +68,7 @@ class PIDController():
         # TODO: implement a PID controller to track the reference lateral offset
         # feel free to make use of the global variables:
         # self.kp, self.ki, and self. kd, which are
-        # set either by the notebook or from noVNC
+        # set from the notebook panel (ROS 2 parameters kp, ki, kd)
         # as well as self_prev_int_offset to track the integral term
         # self.prev_e_offset the previous error. But note that you
         # should be the one to update them also.
