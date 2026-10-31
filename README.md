@@ -186,7 +186,7 @@ and your `pid_controller_node`. You control them from the notebooks: a parameter
 references, `start` / `stop` buttons and a live plot of the odometry.
 
 For debugging, a terminal inside the code editor (`dts code editor`) is connected to the robot when the shell knows the
-robot name (start it with `VEHICLE_NAME=[ROBOT_NAME] bash`): `ros2 node list`, `ros2 topic list`, `ros2 topic echo /[ROBOT_NAME]/encoder_pose_node/pose`,
+robot name (run `dt-ros2-connect [ROBOT_NAME]` in it first): `ros2 node list`, `ros2 topic list`, `ros2 topic echo /[ROBOT_NAME]/encoder_pose_node/pose`,
 `ros2 param list /[ROBOT_NAME]/pid_controller_node`, `ros2 param set /[ROBOT_NAME]/pid_controller_node kp 2.0`,
 `ros2 service call /[ROBOT_NAME]/pid_controller_node/stop std_srvs/srv/Trigger`.
 
