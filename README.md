@@ -158,8 +158,8 @@ This learning experience runs on ROS 2 (Jazzy). Once the (virtual or real) robot
 `dts fleet discover`, start the ROS 2 stack on it (two commands, run from any directory):
 
 ```
-dts stack up -R [ROBOT_NAME] ros2/duckiebot
-dts stack up -R [ROBOT_NAME] ros2-core/default
+dts stack up -H [ROBOT_NAME] ros2/duckiebot
+dts stack up -H [ROBOT_NAME] ros2-core/default
 ```
 
 Virtual robots still autoboot the ROS 1 stack, so the ROS 2 stack is started explicitly for now. Real
