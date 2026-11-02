@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://duckietown.com"><img src="/assets/images/dtlogo.png" alt="Duckietown Logo" width="50%"></a>
+<a href="https://duckietown.com"><img src="./assets/images/dtlogo.png" alt="Duckietown Logo" width="50%"></a>
 </p>
 
 # **Learning Experience (LX): Control**
@@ -51,19 +51,27 @@ Update your exercise definition and instructions,
   To switch to an ente profile, follow the [Duckietown Manual DTS installation instructions](https://docs.duckietown.com/ente/duckietown-manual/10-setup/02-software/duckietown-shell-dts-installation.html#dt-account-switch-profile).
 
 
-- 💻 Always make sure your Duckietown Shell is updated to the latest version. See [installation instructions](https://github.com/duckietown/duckietown-shell)
+- 💻 Always make sure your Duckietown Shell is updated to the latest version: `pipx upgrade duckietown-shell` (see the [installation instructions](https://github.com/duckietown/duckietown-shell))
 
 - 💻 Update the shell commands: `dts update`
 
 - 💻 Update your laptop/desktop: `dts desktop update`
 
-- 🚙 Update your Duckiebot: `dts duckiebot update ROBOTNAME` (where `ROBOTNAME` is the name of your Duckiebot chosen during the initialization procedure.)
-(where `ROBOTNAME` is the name of your Duckiebot - real or virtual.)
+- 🚙 Update your Duckiebot: `dts duckiebot update ROBOTNAME` (where `ROBOTNAME` is the name of your Duckiebot - real or virtual.)
 
 **Note**: if your virtual robot hangs indefinitely when you try to update it, you can try to restart it with:
 
+    dts duckiebot virtual restart [VBOT]
 
-## 3. Work on the exercise
+
+## 3. Calibrate your Duckiebot
+
+Since DC motors and robots are never perfectly identical, a calibration is necessary. Start by performing the [calibration procedure](https://docs.duckietown.com/ente/duckietown-manual/20-operations/04-calibrations/duckiebot-motor-odometry-calibration.html) so that when you command your robot to go straight, it actually goes straight.
+
+On the ROS 2 stack the wheel `trim` and `gain` are read at start-up from `/data/config/calibrations/kinematics/<ROBOTNAME>.yaml` on the robot (the procedure above uses ROS 1 tools), so edit `trim` in that file and restart the core stack (`dts stack down -H ROBOTNAME ros2-core/default`, then `dts stack up -H ROBOTNAME ros2-core/default`).
+
+
+## 4. Work on the exercise
 
 ### Launch the code editor
 
@@ -97,8 +105,12 @@ Inside the code editor, use the navigator sidebar on the left-hand side to navig
 
 Follow the instructions on the notebook and work through the notebooks in sequence.
 
+Once you have completed all the tasks in the notebooks, you can follow the instructions below to test your code.
+
 
 ### Testing with the Duckiematrix
+
+It can be useful to test your code in a simulated environment before trying it on the real robot. For this, we have the Duckiematrix.
 
 To test your code in the Duckiematrix you will need a virtual robot. You can create one with the command:
 
@@ -161,7 +173,7 @@ You can build your code with
 dts code build -R ROBOT_NAME
 ```
 
-This will build a docker image with your code compiled inside - you should see your ROS node get built during the process. 
+where `ROBOT_NAME` can be a real or a virtual robot. This will build a docker image with your code compiled inside - you should see your ROS node get built during the process. 
 
 
 
@@ -202,3 +214,7 @@ robot name (run `dt-ros2-connect [ROBOT_NAME]` in it first): `ros2 node list`, `
 
 
 Now you can proceed to the [first notebook](./notebooks/PID_heading_controller.ipynb).
+
+# Credits
+
+This exercise was originally developed by Jacopo Tani at Duckietown.
