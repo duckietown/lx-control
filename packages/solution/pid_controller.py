@@ -44,7 +44,7 @@ class PIDController():
         # should be the one to update them also.
 
         v = v_ref
-        omega = np.random.uniform(-8.0, 8.0)
+        omega = 0.0
         return v, omega
 
     def OffsetControl(self,
@@ -73,7 +73,7 @@ class PIDController():
         # self.prev_e_offset the previous error. But note that you
         # should be the one to update them also.
 
-        omega = np.random.uniform(-8.0, 8.0)
+        omega = 0.0
         v = v_ref
         return v, omega
 
