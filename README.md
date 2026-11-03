@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://duckietown.com"><img src="/assets/images/dtlogo.png" alt="Duckietown Logo" width="50%"></a>
+<a href="https://duckietown.com"><img src="./assets/images/dtlogo.png" alt="Duckietown Logo" width="50%"></a>
 </p>
 
 # **Learning Experience (LX): Control**
@@ -51,19 +51,27 @@ Update your exercise definition and instructions,
   To switch to an ente profile, follow the [Duckietown Manual DTS installation instructions](https://docs.duckietown.com/ente/duckietown-manual/10-setup/02-software/duckietown-shell-dts-installation.html#dt-account-switch-profile).
 
 
-- 💻 Always make sure your Duckietown Shell is updated to the latest version. See [installation instructions](https://github.com/duckietown/duckietown-shell)
+- 💻 Always make sure your Duckietown Shell is updated to the latest version: `pipx upgrade duckietown-shell` (see the [installation instructions](https://github.com/duckietown/duckietown-shell))
 
 - 💻 Update the shell commands: `dts update`
 
 - 💻 Update your laptop/desktop: `dts desktop update`
 
-- 🚙 Update your Duckiebot: `dts duckiebot update ROBOTNAME` (where `ROBOTNAME` is the name of your Duckiebot chosen during the initialization procedure.)
-(where `ROBOTNAME` is the name of your Duckiebot - real or virtual.)
+- 🚙 Update your Duckiebot: `dts duckiebot update ROBOTNAME` (where `ROBOTNAME` is the name of your Duckiebot - real or virtual.)
 
 **Note**: if your virtual robot hangs indefinitely when you try to update it, you can try to restart it with:
 
+    dts duckiebot virtual restart [VBOT]
 
-## 3. Work on the exercise
+
+## 3. Calibrate your Duckiebot
+
+Since DC motors and robots are never perfectly identical, a calibration is necessary. Start by performing the [calibration procedure](https://docs.duckietown.com/ente/duckietown-manual/20-operations/04-calibrations/duckiebot-motor-odometry-calibration.html) so that when you command your robot to go straight, it actually goes straight.
+
+On the ROS 2 stack the wheel `trim` and `gain` are read at start-up from `/data/config/calibrations/kinematics/<ROBOTNAME>.yaml` on the robot (the procedure above uses ROS 1 tools), so edit `trim` in that file and restart the core stack (`dts stack down -H ROBOTNAME ros2-core/default`, then `dts stack up -H ROBOTNAME ros2-core/default`).
+
+
+## 4. Work on the exercise
 
 ### Launch the code editor
 
@@ -97,8 +105,12 @@ Inside the code editor, use the navigator sidebar on the left-hand side to navig
 
 Follow the instructions on the notebook and work through the notebooks in sequence.
 
+Once you have completed all the tasks in the notebooks, you can follow the instructions below to test your code.
+
 
 ### Testing with the Duckiematrix
+
+It can be useful to test your code in a simulated environment before trying it on the real robot. For this, we have the Duckiematrix.
 
 To test your code in the Duckiematrix you will need a virtual robot. You can create one with the command:
 
@@ -140,6 +152,19 @@ From here you can click anywhere on the window and click [ENTER] to make it beco
 If you get very lost from the road and you want to come back, you can do so with the 'R' key. 
 
 
+### Bring up the ROS 2 stack on the robot
+
+This learning experience runs on ROS 2 (Jazzy). Once the (virtual or real) robot shows as `Ready` in
+`dts fleet discover`, start the ROS 2 stack on it (two commands, run from any directory):
+
+```
+dts stack up -H [ROBOT_NAME] ros2/duckiebot
+dts stack up -H [ROBOT_NAME] ros2-core/default
+```
+
+Virtual robots still autoboot the ROS 1 stack, so the ROS 2 stack is started explicitly for now. Real
+robots: run `dts duckiebot update [ROBOT_NAME]` first, then the same two commands.
+
 ### Building your code
 
 You can build your code with 
@@ -148,7 +173,7 @@ You can build your code with
 dts code build -R ROBOT_NAME
 ```
 
-This will build a docker image with your code compiled inside - you should see your ROS node get built during the process. 
+where `ROBOT_NAME` can be a real or a virtual robot. This will build a docker image with your code compiled inside - you should see your ROS node get built during the process. 
 
 
 
@@ -168,14 +193,28 @@ and to test your code on your real Duckiebot you can do:
 dts code workbench -R [ROBOT_NAME]
 ```
 
+The workbench starts the two ROS 2 nodes of this exercise on the robot: `encoder_pose_node` (from the recipe)
+and your `pid_controller_node`. You control them from the notebooks: a parameter panel for the gains and
+references, `start` / `stop` buttons and a live plot of the odometry.
 
-In another terminal, you can launch the `noVNC` viewer for this exercise which can be useful to send commands to the robot and view the odometry that you calculating in the RViZ window. 
+For debugging, a terminal inside the code editor (`dts code editor`) is connected to the robot when the shell knows the
+robot name (run `dt-ros2-connect [ROBOT_NAME]` in it first): `ros2 node list`, `ros2 topic list`, `ros2 topic echo /[ROBOT_NAME]/encoder_pose_node/pose`,
+`ros2 param list /[ROBOT_NAME]/pid_controller_node`, `ros2 param set /[ROBOT_NAME]/pid_controller_node kp 2.0`,
+`ros2 service call /[ROBOT_NAME]/pid_controller_node/stop std_srvs/srv/Trigger`.
 
-```
-dts code vnc -R [ROBOT_NAME]
-```
 
-where `[ROBOT_NAME]` could be the real or the virtual robot (use whichever you ran the `dts code workbench` and `dts code build` command with).
+**Troubleshooting**
+
+- Right after connecting, the ROS 2 graph takes a few seconds to sync through the zenoh router: use
+  `ros2 topic list --no-daemon --spin-time 5` (and `ros2 node list --no-daemon --spin-time 5`) if a list comes back empty.
+- The node publishes (`ros2 topic echo /[ROBOT_NAME]/car_cmd_switch_node/cmd` shows commands) but the robot does not move:
+  check which topic the robot's kinematics node reads with `ros2 node info /[ROBOT_NAME]/kinematics_node`. Robot images
+  built before October 2026 listen on `/[ROBOT_NAME]/car_cmd`; relaunch the workbench with the remapping
+  `car_cmd_topic:=car_cmd` (`CAR_CMD_TOPIC=car_cmd dts code workbench ...`, or `ros2 launch pid_controller pid_controller_node.launch.py veh:=[ROBOT_NAME] car_cmd_topic:=car_cmd` in the workbench container).
 
 
 Now you can proceed to the [first notebook](./notebooks/PID_heading_controller.ipynb).
+
+# Credits
+
+This exercise was originally developed by Jacopo Tani at Duckietown.
