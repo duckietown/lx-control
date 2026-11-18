@@ -1,0 +1,14 @@
+/**:
+  ros__parameters:
+    # which controller runs: "pid_heading" (PID_heading_controller.ipynb) or "pid_offset" (PID_offset_controller.ipynb)
+    activity: "pid_heading"
+    # PID gains (set them from the notebook panel; they are applied live)
+    kp: 0.0
+    ki: 0.0
+    kd: 0.0
+    # fixed linear velocity [m/s] - zero so the robot only moves once you set it and press "start"
+    v_ref: 0.0
+    # reference lateral offset [m] for the pid_offset activity
+    offset_ref: 0.0
+    # reference heading [deg] for the pid_heading activity
+    heading_ref: 0.0
